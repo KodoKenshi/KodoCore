@@ -17,10 +17,10 @@ import java.util.zip.GZIPOutputStream
 
 inline fun createItemStack(material: Material = Material.STONE, amount: Int = 1, op: ItemStack.() -> Unit = {}) = ItemStack(material, amount).apply(op)
 
-inline val ItemStack.dataContainerCopy get() = itemMeta.persistentDataContainer
-inline fun ItemStack.dataContainer(block: PersistentDataContainer.() -> Unit) = apply { itemMeta = itemMeta.apply { persistentDataContainer.apply(block) } }
+inline val ItemStack.dataContainerCopy get() = itemMeta?.persistentDataContainer
+inline fun ItemStack.dataContainer(block: PersistentDataContainer.() -> Unit) = apply { itemMeta = itemMeta?.apply { persistentDataContainer.apply(block) } }
 
-fun ItemStack.addItemFlag(vararg flags: ItemFlag) = apply { itemMeta = itemMeta.apply { addItemFlags(*flags) } }
+fun ItemStack.addItemFlag(vararg flags: ItemFlag) = apply { itemMeta = itemMeta?.apply { addItemFlags(*flags) } }
 fun ItemStack?.isNotNullOrAir() = this != null && type != Material.AIR
 fun ItemStack?.isNullOrAir() = !isNotNullOrAir()
 fun ItemStack.isSimilar(
@@ -53,8 +53,8 @@ fun ItemStack.isSimilar(
     }
     if (considerLore) {
 
-        val otherLore = other.lore ?: listOf()
-        for ((index, line) in (lore ?: listOf()).withIndex())
+        val otherLore = other.lore
+        for ((index, line) in lore.withIndex())
             if (otherLore[index] != line)
                 return false
 
@@ -73,13 +73,13 @@ inline var ItemStack.displayName get() = if (hasDisplayName) itemMeta?.displayNa
     }
 inline val ItemStack.hasDisplayName get() = itemMeta?.hasDisplayName() == true
 inline var ItemStack.material get() = type; set(material) { type = material }
-fun ItemStack.removeLore(line: String) { description = description.toMutableList().apply { remove(line) } }
-fun ItemStack.addLore(vararg line: String) { description = description.apply { addAll(line) } }
-inline var ItemStack.description get() = if (hasLore) itemMeta?.lore!! else mutableListOf()
+fun ItemStack.removeLore(line: String) { lore = lore.toMutableList().apply { remove(line) } }
+fun ItemStack.addLore(vararg line: String) { lore = lore.apply { addAll(line) } }
+inline var ItemStack.lore: MutableList<String> get() = if (hasLore) itemMeta?.lore!! else mutableListOf()
     set(lore) {
         itemMeta?.apply {
             setLore(lore)
-            this@description.itemMeta = this
+            this@lore.itemMeta = this
         }
     }
 inline val ItemStack.hasLore get() = itemMeta?.hasLore() == true

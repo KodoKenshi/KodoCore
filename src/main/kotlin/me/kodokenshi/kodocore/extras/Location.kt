@@ -12,10 +12,12 @@ import kotlin.math.max
 import kotlin.math.min
 
 fun Location.getHighestBlock(
-    minY: Int = -64,
-    maxY: Int = world.maxHeight,
+    minY: Int = world?.minHeight ?: -64,
+    maxY: Int = world?.maxHeight ?: 320,
     ignore: List<Material?> = listOf(),
-): Block {
+): Block? {
+
+    val world = world ?: return null
 
     val x = x.toInt()
     var y = maxY
